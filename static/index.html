@@ -1,0 +1,226 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+    "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+  <title>MMO Game Simulation</title>
+
+  <script src="https://code.jquery.com/jquery-1.11.3.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/fabric.js/1.5.0/fabric.min.js"></script>
+
+  <script src="/socket.io/socket.io.js"></script>
+  <script>
+
+  </script>
+  <script>
+
+    $(function(){
+
+      var config;
+
+
+      var canvas;
+      var localConfig = {
+        users: {
+          dim: {
+            min: 5,
+            max: 15
+          }
+        }
+      }
+
+      var xRatio, yRatio;
+      canvas = this.__canvas = new fabric.Canvas('c');
+      fabric.Object.prototype.transparentCorners = false;
+
+      ['Rect', 'Triangle', 'Circle'].forEach(function(klass){
+        fabric[klass].prototype.getCenter = function() {
+          return {
+            x: this.left + this.dim/2,
+            y: this.top + this.dim/2
+          };
+        }
+      });
+
+      function updateScreenRatio() {
+        xRatio = config.world.width / canvas.width;
+        yRatio = config.world.height / canvas.height;
+      }
+
+      function normalizeLeft(worldLeft) {
+        return worldLeft / xRatio;
+      }
+      function normalizeTop(worldTop) {
+        return worldTop / yRatio;
+      }
+
+      var shapes = {};
+      var shapesList = [];
+
+      // create a user if not exists, or just update a location of an existing one
+      function createUserIfNotExists(user, withBorder) {
+        var localUser = shapes[user.id];
+        if (localUser) {
+          // user already exists on canvas
+          localUser.set({
+            left: normalizeLeft(user.x),
+            top: normalizeTop(user.y)
+          });
+          // this is a workaround- probably there's a better way of refreshing the screen.
+          canvas.remove(localUser).add(localUser);
+        }
+        else {
+          // new user
+          var dim = fabric.util.getRandomInt(localConfig.users.dim.min, localConfig.users.dim.max);
+          var klass = ['Rect', 'Triangle', 'Circle'][fabric.util.getRandomInt(0,2)];
+          var options = {
+            left: normalizeLeft(user.x),
+            top: normalizeTop(user.y),
+            fill: ['green', 'red', 'blue'][fabric.util.getRandomInt(0,2)]
+          };
+          if (klass === 'Circle') {
+            options.radius = dim/2;
+          }
+          else {
+            options.width = dim;
+            options.height = dim;
+          }
+          localUser = new fabric[klass](options);
+          localUser.id = user.id;
+          localUser.dim = dim;
+
+          shapes[localUser.id] = localUser;
+          shapesList.push(localUser);
+          canvas.add(localUser);
+        }
+
+        if(withBorder) {
+          localUser.border = drawRect(localUser, config.view.width, config.view.height, '#FF0000');
+          localUser.extra = drawRect(localUser, config.view.width + config.view.extraX * 2, config.view.height + config.view.extraY * 2, '#0000FF');
+        }
+
+      }
+
+      // draw a border around the user
+      // to visualize his view
+      function drawRect(user, width, height, color) {
+        var rect = new fabric.Rect({
+          width: normalizeLeft(width),
+          height: normalizeTop(height),
+          left: user.getCenter().x - normalizeLeft(width)/2,
+          top: user.getCenter().y-normalizeTop(height)/2,
+          stroke: color,
+          fill: false,
+          strokeWidth: 1,
+          selectable: false
+        });
+        canvas.add(rect);
+        return rect;
+      }
+
+      // remove border around user
+      function removeBorders(user) {
+        canvas.remove(user.border);
+        canvas.remove(user.extra);
+      }
+
+      // start simulation
+      $("#start").click(function() {
+
+        var eventsInterval;
+
+        function startEvents() {
+          // simulate user's location change event
+          // every second. this will propagate
+          // to all clients connected to any server
+          // through the Redis pub/sub mechanism
+          eventsInterval = setInterval(function(){
+            var user = shapes[userId];
+            if (user)
+                removeBorders(user);
+
+            var options = getRandomCoords();
+            options.getAroundMe = true;
+            socket.emit('location', options);
+
+            // draw on canvas
+            options.id = userId;
+            createUserIfNotExists(options, true);
+          }, 1000);
+        }
+
+        $("#pause").click(function(){
+          if(eventsInterval) {
+            clearInterval(eventsInterval);
+            eventsInterval = null;
+            $(this).val("Continue");
+          }
+          else {
+            startEvents();
+            $(this).val("Pause");
+          }
+        });
+
+        var userId = $("#username").val();
+        if(!userId) return alert('please provide a valid username');
+
+        $("#start, #username").attr("disabled", true);
+
+        var socket = io();
+        socket.emit('auth', {userId: userId});
+
+        startEvents();
+
+
+        // handle location changed events from the server
+        // in this case- we're getting all users' location
+        // change events. no optimization to get only those
+        // in our view yet.
+        socket.on('locationChanged', function(user){
+          console.log('locationChanged', user);
+          createUserIfNotExists(user);
+        });
+
+        // get all users around a specific user
+        socket.on('aroundUser', function(data){
+          var user = shapes[data.me.id];
+          if (!user) return console.error('user does not exists', data);
+          //for(var i=0; i<user.rects.length; i++)
+          //  removeRect(user.rects.pop());
+
+          // draw all users around me
+          for(var i=0; i<data.users.length; i++) {
+            createUserIfNotExists(data.users[i]);
+          }
+        });
+
+        // get configuration from server side
+        socket.on('config', function(data){
+          console.log('config', data);
+          config = data;
+          updateScreenRatio();
+        });
+
+        // get random coordinates in the world
+        function getRandomCoords() {
+          return {
+            x: Math.ceil(Math.random() * config.world.width),
+            y: Math.ceil(Math.random() * config.world.height)
+          };
+        }
+      });
+    });
+
+  </script>
+
+</head>
+<body>
+
+<div>
+  <h2>MMO Game Simulation</h2>
+  <p>
+    Username: <input id="username" style="width: 200px;"> <input type="button" id="start" value="Start!"> <input type="button" id="pause" value="Pause">
+  </p>
+  <canvas id="c" width="1000" height="500" style="border: 1pt solid black;"></canvas>
+</div>
+</body>
+</html>
