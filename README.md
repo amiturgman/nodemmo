@@ -49,4 +49,4 @@ You will notice that once you move out of the view, you will not get any locatio
 
 
 # License
-[MIT](blob/master/LICENSE)
+[MIT](LICENSE)
