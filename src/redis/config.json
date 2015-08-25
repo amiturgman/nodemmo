@@ -1,0 +1,7 @@
+{
+  "port": 6379,
+  "host": "localhost",
+  "family": 4,
+  "db": 0,
+  "enableReadyCheck": true
+}

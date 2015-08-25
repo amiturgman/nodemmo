@@ -1,12 +1,6 @@
 var Redis = require('ioredis');
 
-var redisOpts = {
-  port: 6379,
-  host: 'localhost',
-  family: 4, // 4(IPv4) or 6(IPv6)
-  db: 0,
-  enableReadyCheck: true
-};
+var redisConfig= require('./config.json');
 
 var redis, pub, handler;
 var redisReady = false;
@@ -15,7 +9,7 @@ var channel = 'locationChanged';
 function init(cb) {
 
   var self = this;
-  redis = new Redis(redisOpts);
+  redis = new Redis(redisConfig);
   pub = redis.duplicate();
 
   redis.on('connect', function(){

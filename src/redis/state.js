@@ -1,16 +1,9 @@
 
-var dbgrid = require('./dbgrid')();
+var spatialMapper = require('spatial-mapping')();
 var Redis = require('ioredis');
 
-var redisOpts = {
-  port: 6379,
-  host: 'localhost',
-  family: 4,           // 4(IPv4) or 6(IPv6)
-  db: 0,
-  enableReadyCheck: true
-};
-
-var redis = new Redis(redisOpts);
+var redisConfig= require('./config.json');
+var redis = new Redis(redisConfig);
 var USERS = 'users';
 
 module.exports = function() {
@@ -27,6 +20,7 @@ module.exports = function() {
     count: function(cb) {
       return redis.hlen(USERS, cb);
     },
+
     // gets a specific user
     getUser: function(id, cb) {
       return redis.hgetall(id, function(err, user){
@@ -37,6 +31,7 @@ module.exports = function() {
         return cb(null, user);
       });
     },
+
     // sets a user location in the state server
     setUserLocation: function(options, cb) {
       return this.getUser(options.id, function(err, user){
@@ -45,6 +40,7 @@ module.exports = function() {
           return cb(new Error('error getting user: ' + err.message));
         }
 
+        // starts a transaction
         var tx = redis.multi();
 
         if (user) {
@@ -60,7 +56,7 @@ module.exports = function() {
         }
 
         // gets current grid key
-        var gridKey = dbgrid.getKey(options.x, options.y);
+        var gridKey = spatialMapper.getKey(options.x, options.y);
 
         // within a transaction scope-
         return tx
@@ -106,7 +102,7 @@ module.exports = function() {
   function getUsers(options, cb) {
 
     // get users from neighbours grids
-    var gridKeys = dbgrid.getNeighbors(options.x, options.y);
+    var gridKeys = spatialMapper.getNeighbors(options.x, options.y);
     //console.log('looking for grid keys', gridKeys);
 
     var pipeline = redis.pipeline();

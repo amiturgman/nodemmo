@@ -172,9 +172,6 @@
 
 
         // handle location changed events from the server
-        // in this case- we're getting all users' location
-        // change events. no optimization to get only those
-        // in our view yet.
         socket.on('locationChanged', function(user){
           console.log('locationChanged', user);
           createUserIfNotExists(user);

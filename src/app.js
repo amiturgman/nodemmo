@@ -14,8 +14,8 @@ var io = require('socket.io')(http);
 
 var port = process.env.PORT || 3001;
 
-var redispubsub = require('./redispubsub.js');
-var redisState = require('./redisState.js');
+var redispubsub = require('./redis/pubsub');
+var redisState = require('./redis/state');
 
 var state, usersCount;
 
@@ -59,7 +59,6 @@ app.post('/location', function(req, res){
     return res.json(result);
   });
 });
-
 
 // reset the users collection
 app.get('/reset', function(req, res){

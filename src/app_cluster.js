@@ -1,5 +1,8 @@
 
-
+/*
+  start this file if you want to fork multiple processes of this service
+  as the number of cores the machine hosting this process has
+ */
 
 var cluster = require('cluster');
 
