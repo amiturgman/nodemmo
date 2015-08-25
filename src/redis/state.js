@@ -102,7 +102,7 @@ module.exports = function() {
   function getUsers(options, cb) {
 
     // get users from neighbours grids
-    var gridKeys = spatialMapper.getNeighbors(options.x, options.y);
+    var gridKeys = spatialMapper.getViewGrids(options.x, options.y);
     //console.log('looking for grid keys', gridKeys);
 
     var pipeline = redis.pipeline();
@@ -125,20 +125,16 @@ module.exports = function() {
         if (err) return cb(err);
 
         var users = [];
-        var x = options.x,
-          y = options.y,
-          from = [x - options.width/2,  y - options.height/2],
-          to = [x + options.width/2, y + options.height/2];
 
         results.forEach(function(result){
           if(result[0]) return cb(result[0]);
           var user = result[1];
           var user_x = parseInt(user.x);
           var user_y = parseInt(user.y);
-          if (user_x >= from[0] && user_x <= to[0] &&
-              user_y >= from[1] && user_y <= to[1]) {
-            user.x = parseInt(user.x);
-            user.y = parseInt(user.y);
+
+          if(isInView({x: user_x, y: user_y}, options)) {
+            user.x = user_x;
+            user.y = user_y;
             users.push(user);
           }
         });
@@ -146,6 +142,12 @@ module.exports = function() {
         return cb(null, users);
       });
     });
+
+    // check if the user is in the client view space
+    function isInView(user, client) {
+      return  Math.abs(client.x - user.x) <= options.width &&
+        Math.abs(client.y - user.y) <= options.height;
+    }
   }
 
   return api;

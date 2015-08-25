@@ -165,7 +165,6 @@ function initSockets() {
       options.id = client._userData.userId;
       client._userData.x = options.x;
       client._userData.y = options.y;
-      console.log(options);
 
       // update user's location in the state server
       // and publish location change events to all servers
@@ -208,7 +207,9 @@ function updateUserLocationChange(options, cb) {
       var data = {id: options.id, x: options.x, y: options.y};
       redispubsub.publish(JSON.stringify(data));
 
+      console.log('user', user);
       var result = {me: user};
+
       // if user also wants to get users around him after updating
       // his location, we'll fetch the users around him and send
       // the result to him
