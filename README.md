@@ -1,7 +1,7 @@
 # nodemmo
 Massively Multiplayer Online Game for young developers using node.js and Redis
 
-!(https://github.com/amiturgman/nodemmo/raw/master/img/simulation.png "MMO visualization")
+![MMO visualization](https://github.com/amiturgman/nodemmo/raw/master/img/simulation.png "MMO visualization")
 
 This code is a sample for creating a scalable MMO game for young developers. The idea is that there's no use of any MMO framework so that it is not a barrier for new developers.
 We keep it simple by using only nodejs & Redis.
@@ -39,7 +39,7 @@ Only users that we're in their visible area- will get the event, and will see us
 
 In order to see how this is working, there's also a hook which allows you to trigger location-change events by triggering an http request:
 
-(https://github.com/amiturgman/nodemmo/raw/master/img/http-location.png "triggers http location change event")
+![triggers http location change event](https://github.com/amiturgman/nodemmo/raw/master/img/http-location.png "triggers http location change event")
 
 Press `pause` to stop the location change events, and look at the last location change event that was sent to the server by switching to the node console.
 Trigger a similar http `POST` request to `http://localhost:3001/location`, by replacing the `x` and `y` coordinates with nearby coordinates.
