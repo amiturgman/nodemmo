@@ -1,4 +1,6 @@
 
+// Redis API documentation can be found here: http://redis.io/commands
+
 var spatialMapper = require('spatial-mapping')();
 var Redis = require('ioredis');
 
@@ -7,7 +9,6 @@ var redis = new Redis(redisConfig);
 var USERS = 'users';
 
 module.exports = function() {
-
 
   var api = {
 

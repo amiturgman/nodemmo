@@ -54,8 +54,7 @@ app.use(bodyParser.json());
 // by posting an event manually
 app.post('/location', function(req, res){
   return updateUserLocationChange(req.body, function(err, result){
-    if(err)
-      return res.end(err.message);
+    if(err) return res.end(err.message);
     return res.json(result);
   });
 });
@@ -150,8 +149,7 @@ function initSockets() {
 
     // authenticate user and save his id on the client data
     socket.on('auth', function(data){
-      if(!data.userId)
-        return console.warn('userId was not provided');
+      if(!data.userId) return console.warn('userId was not provided');
       client._userData.userId = data.userId;
     });
 
@@ -199,8 +197,7 @@ function updateUserLocationChange(options, cb) {
 
   return state.setUserLocation(options,
     function(err, user){
-      if(err)
-        return cb(err);
+      if(err) return cb(err);
 
       // update all servers with the user's new location
       // this could also be done in parallel to updating the state server.
@@ -216,8 +213,7 @@ function updateUserLocationChange(options, cb) {
       if (options.getAroundMe) {
         return state.getUsers(options,
           function(err, users){
-            if(err)
-              return console.warn('error getting users around me:' + err.message);
+            if(err) return console.warn('error getting users around me:' + err.message);
             result.users = users;
             return cb(null, result);
           });
