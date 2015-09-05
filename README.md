@@ -31,7 +31,7 @@ Then, enlist the code and run:
 ```
 
 # test
-Open your favorite browser, and browse to `http://localhost:3000`
+Open your favorite browser, and browse to `http://localhost:3000`.
 I used 3000 because I read somewhere on the internet that it was cool.
 
 In the username textbox, type a username and hit the `Start` button.
