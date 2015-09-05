@@ -1,9 +1,9 @@
 # nodemmo
-Massively Multiplayer Online Game for young developers using node.js and Redis
+Multiplayer online game for young developers using node.js and Redis
 
 ![MMO visualization](https://github.com/amiturgman/nodemmo/raw/master/img/simulation.png "MMO visualization")
 
-This code is a sample for creating a scalable MMO game for young developers. The idea is that there's no use of any MMO framework so that it is not a barrier for new developers.
+This code is a sample for creating a multiplayer online game for young developers. The idea is that there's no use of any MMO framework so that it is not a barrier for new developers.
 We keep it simple by using only nodejs & Redis.
 Redis is our state server which keeps the state of all the players in the game. Our servers are stateless, so it doesn't really matters to which servers the users are connected.
 We'll use Redis pub/sub feature to also sync all the servers with all the users' location change updates.
@@ -31,7 +31,8 @@ Then, enlist the code and run:
 ```
 
 # test
-Open your favorite browser, and browse to `http://localhost:3001`
+Open your favorite browser, and browse to `http://localhost:3000`
+I used 3000 because I read somewhere on the internet that it was cool.
 
 In the username textbox, type a username and hit the `Start` button.
 This will trigger a random location-update event beeing sent to the server every second, and propagate to all users connected to one of the servers.
@@ -42,7 +43,7 @@ In order to see how this is working, there's also a hook which allows you to tri
 ![triggers http location change event](https://github.com/amiturgman/nodemmo/raw/master/img/http-location.png "triggers http location change event")
 
 Press `pause` to stop the location change events, and look at the last location change event that was sent to the server by switching to the node console.
-Trigger a similar http `POST` request to `http://localhost:3001/location`, by replacing the `x` and `y` coordinates with nearby coordinates.
+Trigger a similar http `POST` request to `http://localhost:3000/location`, by replacing the `x` and `y` coordinates with nearby coordinates.
 Once triggering the request, you should see the new user located around you in the view. Try playing with the coordinates, and move the users further to the view + extra borders (red and blue).
 You will notice that once you move out of the view, you will not get any location updates anymore.
 

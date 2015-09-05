@@ -12,7 +12,7 @@ var app = express();
 var http = require('http').Server(app);
 var io = require('socket.io')(http);
 
-var port = process.env.PORT || 3001;
+var port = process.env.PORT || 3000;
 
 var redispubsub = require('./redis/pubsub');
 var redisState = require('./redis/state');
