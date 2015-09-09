@@ -1,22 +1,22 @@
 # nodemmo
-Multiplayer online game for young developers using node.js and Redis
+Multiplayer online game for novice developers using node.js and Redis
 
 ![MMO visualization](https://github.com/amiturgman/nodemmo/raw/master/img/simulation.png "MMO visualization")
 
-This code is a sample for creating a multiplayer online game for young developers. The idea is that there's no use of any MMO framework so that it is not a barrier for new developers.
+This code is a sample for creating a multiplayer online game for novice developers. The idea is that there's no use of any MMO framework so that it is not a barrier for novice developers.
 We keep it simple by using only nodejs & Redis.
-Redis is our state server which keeps the state of all the players in the game. Our servers are stateless, so it doesn't really matters to which servers the users are connected.
+Redis is our state server which keeps the state of all the players in the game. Our servers are stateless, so it doesn't matters to which servers the users are connected.
 We'll use Redis pub/sub feature to also sync all the servers with all the users' location change updates.
 
-We have one big world, which we split to areas/buckets/views using the [spatial-mapping](https://github.com/amiturgman/spatial-mapping) node module. Each area is mapped to a specific Id in the world
-so that we can just use a hash to keep which users are in a specific area. We can also use this key to save this data in a simple database, like Azure Table for example, which cost less than any spatial-capable solution out there.
+We have one big world, which we split to buckets using the [spatial-mapping](https://github.com/amiturgman/spatial-mapping) node module. Each bucket is mapped to a specific Id in the world
+so that we can use a hash to keep which users are in each bucket. We can also use this key to save this data in a simple database, like Azure Table for example, which cost less than any spatial-capable solution.
 
-Currently, the client side is a simulation of how the world is look like from a 30 miles above.
+Currently, the client side is a simulation of how the world looks like from 30 miles high.
 We can see the players spread in the world, and also our "view"- the red border around us.
 The "view" is the area that is visible to us as players. The blue border around the red one, is an area for which we still get updates, although it is not visible to us.
 This is for the client logic to know that a player is coming to our direction, or a player is leaving our visible area.
 
-Find more about this in my [blog post](http://todo-add-url.com).
+Find more about this in my [blog post](https://ami-turgman.squarespace.com/blog-1/2015/9/8/multiplayer-online-game-using-nodejs-and-redis).
 
 # install & setup
 
